@@ -1,16 +1,16 @@
-var fs = require("fs");
-var path = require("path");
-var spawn = require("child_process").spawn;
-var Promise = require("promise");
+'use strict';
+const fs = require('fs');
+const path = require('path');
+const spawn = require('child_process').spawn;
+const PRomise = require('promise');
 
-var keyPresser;
+let keyPresser;
 
 function kbmRobot() {
-    "use strict";
 
-    var DEBUG = false;
+    let DEBUG = false;
 
-    var easyKeys = {
+    let easyKeys = {
         "ESC": "VK_ESCAPE",
         "F1": "VK_F1",
         "F2": "VK_F2",
@@ -80,7 +80,7 @@ function kbmRobot() {
         "KP_.": "VK_DECIMAL"
     };
 
-    var shiftables = {
+    let shiftables = {
         "~": "`",
         "!": "1",
         "@": "2",
@@ -104,34 +104,34 @@ function kbmRobot() {
         "?": "/",
     };
 
-    for (var x = 65; x < 91; ++x) {
-        var letter = String.fromCharCode(x);
+    for (let x = 65; x < 91; ++x) {
+        let letter = String.fromCharCode(x);
         easyKeys[letter] = "VK_" + letter;
     }
 
-    for (x = 48; x < 58; ++x) {
-        var number = String.fromCharCode(x);
+    for (let x = 48; x < 58; ++x) {
+        let number = String.fromCharCode(x);
         easyKeys[number] = "VK_" + number;
     }
 
-    var actionArr = [];
+    let actionArr = [];
 
-    var press = function(key) {
-        var realKey = easyKeys[key.toUpperCase()] || key;
+    let press = function(key) {
+        let realKey = easyKeys[key.toUpperCase()] || key;
         keyPresser.stdin.write("D " + realKey + "\n");
         return Promise.resolve();
     };
 
-    var release = function(key) {
-        var realKey = easyKeys[key.toUpperCase()] || key;
+    let release = function(key) {
+        let realKey = easyKeys[key.toUpperCase()] || key;
         keyPresser.stdin.write("U " + realKey + "\n");
         return Promise.resolve();
     };
 
-    var typeString = function(str, downDelay, upDelay) {
-        var chars = str.split("");
+    let typeString = function(str, downDelay, upDelay) {
+        let chars = str.split("");
         return new Promise(function(res) {
-            var p = Promise.resolve();
+            let p = Promise.resolve();
             chars.forEach(function(character) {
                 p = p.then(function() {
                     return type(character, downDelay);
@@ -144,9 +144,9 @@ function kbmRobot() {
         });
     };
 
-    var type = function(key, delay) {
+    let type = function(key, delay) {
         return new Promise(function(res) {
-            var shiftableKey = shiftables[key];
+            let shiftableKey = shiftables[key];
             if (shiftableKey) {
                 key = shiftableKey;
             }
@@ -184,28 +184,28 @@ function kbmRobot() {
         });
     };
 
-    var sleep = function(amt) {
+    let sleep = function(amt) {
         return new Promise(function(res) {
             setTimeout(res, amt);
         });
     };
 
-    var mouseMove = function(x, y) {
+    let mouseMove = function(x, y) {
         keyPresser.stdin.write("MM " + x + " " + y + "\n");
         return Promise.resolve();
     };
 
-    var mousePress = function(buttons) {
+    let mousePress = function(buttons) {
         keyPresser.stdin.write("MD " + buttons + "\n");
         return Promise.resolve();
     };
 
-    var mouseRelease = function(buttons) {
+    let mouseRelease = function(buttons) {
         keyPresser.stdin.write("MU " + buttons + "\n");
         return Promise.resolve();
     };
 
-    var mouseClick = function(buttons, delay) {
+    let mouseClick = function(buttons, delay) {
         return new Promise(function(res) {
             mousePress(buttons)
             .then(function() {
@@ -218,21 +218,19 @@ function kbmRobot() {
         });
     };
 
-    var mouseWheel = function(amt) {
+    let mouseWheel = function(amt) {
         keyPresser.stdin.write("MW " + amt + "\n");
         return Promise.resolve();
     };
 
-    var notStartedErr = "ERR: kbm-robot not started. ( Call .startJar() ).";
+    const notStartedErr = "ERR: kbm-robot not started. ( Call .startJar() ).";
 
-    var pub = {
-        startJar: function(JRE_ver) {
-            JRE_ver = JRE_ver || 6;
-            var jarPath = path.join(__dirname, "java", "robot" + JRE_ver + ".jar");
+    let pub = {
+        startJar: function() {
+            const jarPath = path.join("./resources/kbm-java", "robot.jar");
             if (!keyPresser) {
                 if (!fs.existsSync(jarPath)) {
-                    throw new Error("ERR: Can't find robot" + JRE_ver +
-                        ".jar. Expected Path: " + jarPath);
+                    throw new Error("ERR: Can't find robot.jar. Expected Path: " + jarPath);
                 }
                 keyPresser = spawn("java", ["-jar", jarPath]);
 
@@ -356,7 +354,7 @@ function kbmRobot() {
             // send a message back so we can kill it after it's truly done.
             pub.sleep(200);
 
-            var p = Promise.resolve();
+            let p = Promise.resolve();
             actionArr.forEach(function(action) {
                 p = p.then(function() {
                     return action.func.apply(action.func, action.args);

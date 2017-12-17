@@ -1,10 +1,14 @@
 {
   "name": "kbm-robot",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "A module to help you emulate system wide keyboard and mouse actions.",
   "main": "kbm-robot.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "clean": "mvn clean",
+    "package": "mvn package",
+    "build": "mvn clean && mvn package",
+    "deploy:win": "npm run build && copy robot\\target\\robot.jar resources\\robot.jar && npm run clean",
+    "deploy:nix": "npm run build && cp ./robot/target/robot.jar ./resources/robot.jar && npm run clean"
   },
   "keywords": [
     "keyboard",
