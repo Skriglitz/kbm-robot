@@ -2,10 +2,10 @@
 const fs = require('fs');
 const path = require('path');
 const spawn = require('child_process').spawn;
-const PRomise = require('promise');
+const Promise = require('promise');
 
 let keyPresser;
-
+let logger;
 function kbmRobot() {
 
     let DEBUG = false;
@@ -234,23 +234,43 @@ function kbmRobot() {
                 }
                 keyPresser = spawn("java", ["-jar", jarPath]);
 
+                keyPresser.on('error', function(err) {
+                    if (logger) {
+                        logger.warn('error: ' + err);
+                    } else {
+                        console.log('error: ' + data);
+                    }
+                });
+
                 // Need to hook up these handlers to prevent the
                 // jar from crashing sometimes.
                 keyPresser.stdout.on('data', function(data) {
                     if (DEBUG) {
-                        console.log('stdout: ' + data);
+                        if (logger) {
+                            logger.debug('stdout: ' + data);
+                        } else {
+                            console.log('stdout: ' + data);
+                        }
                     }
                 });
 
                 keyPresser.stderr.on('data', function(data) {
                     if (DEBUG) {
-                        console.log('stderr: ' + data);
+                        if (logger) {
+                            logger.debug('stderr: ' + data);
+                        } else {
+                            console.log('stderr: ' + data);
+                        }
                     }
                 });
 
                 keyPresser.on('close', function(data) {
                     if (DEBUG) {
-                        console.log('child process exited with code: ' + code);
+                        if (logger) {
+                            logger.debug('child process exited with code: ' + data);
+                        } else {
+                            console.log('child process exited with code: ' + data);
+                        }
                     }
                 });
             } else {
@@ -366,6 +386,14 @@ function kbmRobot() {
             } else {
                 return p;
             }
+        },
+        setDebug: function(value) {
+            this.DEBUG = value;
+            return pub;
+        },
+        setLogger: function(logInstance) {
+            this.logger = logInstance;
+            return pub;
         }
     };
 
