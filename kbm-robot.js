@@ -235,10 +235,12 @@ function kbmRobot() {
                 keyPresser = spawn("java", ["-jar", jarPath]);
 
                 keyPresser.on('error', function(err) {
-                    if (logger) {
-                        logger.warn('error: ' + err);
-                    } else {
-                        console.log('error: ' + data);
+                    if (DEBUG) {
+                        if (logger) {
+                            logger.warn('error: ' + err);
+                        } else {
+                            console.log('error: ' + err);
+                        }
                     }
                 });
 
